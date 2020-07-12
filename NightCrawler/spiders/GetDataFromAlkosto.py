@@ -37,10 +37,10 @@ class GetdatafromalkostoSpider(scrapy.Spider):
                 prod_name = quote.xpath('./h2[@class="product-name"]/a/@title').get()
                 if not prod_name: #If get from "special offers" we can pass to the next prod
                     continue
-                item['name'] = prod_url = quote.xpath('./h2[@class="product-name"]/a/@href').get()
-                item['old_price'] = old_price = str(quote.xpath('./div[@class="price-box"]/p[@class="old-price"]/span[@class="price-old"]/text()').get()).strip('$\u00a0 \t\n\r').replace('.', '')
-                item['new_price'] = new_price = str(quote.xpath('./div[@class="price-box"]/*/*/span[@class="price"]/text()').get()).strip('$\u00a0 \t\n\r').replace('.', '')
-                print("  " + title + "::" + prod_name + "[" + new_price + "]::" + prod_url)
+                item['name'] = quote.xpath('./h2[@class="product-name"]/a/@href').get()
+                item['old_price'] = str(quote.xpath('./div[@class="price-box"]/p[@class="old-price"]/span[@class="price-old"]/text()').get()).strip('$\u00a0 \t\n\r').replace('.', '')
+                item['new_price'] = str(quote.xpath('./div[@class="price-box"]/*/*/span[@class="price"]/text()').get()).strip('$\u00a0 \t\n\r').replace('.', '')
+                item['url'] = url
                 yield item
             next_page_url = response.xpath('//li/a[contains(@class, "next")]/@href').extract_first()
             if next_page_url is not None: #We have Next page
