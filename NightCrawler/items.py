@@ -15,4 +15,6 @@ class AlkostoItem(scrapy.Item):
     name = scrapy.Field()
     old_price = scrapy.Field()
     new_price = scrapy.Field()
+    url = scrapy.Field()
+    category = scrapy.Field()
     pass

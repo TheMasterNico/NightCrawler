@@ -2,8 +2,19 @@ import scrapy
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 from NightCrawler.items import AlkostoItem
+import time
 
 class GetdatafromalkostoSpider(scrapy.Spider):
+
+    def __init__(self, name=None, **kwargs):
+        self.start_time = time.time()
+
+
+    def closed(self, response):
+        self.ending_time = time.time()
+        duration = self.ending_time - self.start_time
+        print("--- %s seconds ---" % duration)
+    
     name = 'GetDataFromAlkosto'
     allowed_domains = ['alkosto.com']
     start_urls = ['https://www.alkosto.com/']
@@ -20,7 +31,8 @@ class GetdatafromalkostoSpider(scrapy.Spider):
 
     def get_data_per_page(self, response):
         title = response.meta.get('title') #Get the argument category
-        url = response.meta.get('url')
+        category_url = response.meta.get('url')  # Get the argument category
+        
         selectores = response.xpath('//div[@class="subcategories"]/ul/li/a') #Check if the page have categories
         if selectores: #If have categories, we
             #print("Categorias en " + title)
@@ -37,12 +49,15 @@ class GetdatafromalkostoSpider(scrapy.Spider):
                 prod_name = quote.xpath('./h2[@class="product-name"]/a/@title').get()
                 if not prod_name: #If get from "special offers" we can pass to the next prod
                     continue
-                item['name'] = quote.xpath('./h2[@class="product-name"]/a/@href').get()
+                item['url'] = quote.xpath('./h2[@class="product-name"]/a/@href').get()
                 item['old_price'] = str(quote.xpath('./div[@class="price-box"]/p[@class="old-price"]/span[@class="price-old"]/text()').get()).strip('$\u00a0 \t\n\r').replace('.', '')
                 item['new_price'] = str(quote.xpath('./div[@class="price-box"]/*/*/span[@class="price"]/text()').get()).strip('$\u00a0 \t\n\r').replace('.', '')
-                item['url'] = url
+                item['name'] = prod_name
+                item['category'] = title
                 yield item
             next_page_url = response.xpath('//li/a[contains(@class, "next")]/@href').extract_first()
             if next_page_url is not None: #We have Next page
-                print("_______________________________________")
+                #print("_______________________________________")
                 yield response.follow(next_page_url, self.get_data_per_page, meta={'title': title, 'url': category_url})
+
+    
