@@ -11,10 +11,13 @@ class NightcrawlerItem(scrapy.Item):
     # name = scrapy.Field()
     pass
 
+
 class AlkostoItem(scrapy.Item):
-    name = scrapy.Field()
-    old_price = scrapy.Field()
-    new_price = scrapy.Field()
     url = scrapy.Field()
+    name = scrapy.Field()
     category = scrapy.Field()
+    prices = scrapy.Field() # This item is array that containts prices and time when is scraped
+    #old_price = scrapy.Field()
+    #new_price = scrapy.Field()
+    #date = scrapy.Field()
     pass

@@ -16,19 +16,16 @@ from scrapy.exceptions import DropItem
 class NightcrawlerPipeline:
 
     def __init__(self):
-        client = MongoClient('localhost', 27017)
-        self.db = client['Alkosto']
+        client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])
+        self.db = client[settings['MONGODB_DB']]
+        self.collection = self.db['Items']
 
     def process_item(self, item, spider):
-        #valid = True
-        #for data in item:
-            #if not data:
-                #valid = False
-                #raise DropItem("Missing {0}!".format(data))
-        #if valid:
-        #categories = item['category'].split("/")
-
-        self.collection = self.db[item['category']]
-        del item['category']
+        #category = item['category']
+        #categories = category.split("\\")
+        #self.collection = self.db[categories[0]]    # The main category    
+        #del item['category'] #no store the category
         self.collection.insert_one(dict(item))
         return item
+
+############SAVE LIKE THIS: https://docs.mongodb.com/manual/tutorial/model-embedded-one-to-many-relationships-between-documents/
