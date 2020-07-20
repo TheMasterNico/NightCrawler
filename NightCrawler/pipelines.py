@@ -13,7 +13,7 @@ from scrapy.utils.project import get_project_settings
 settings = get_project_settings()
 from scrapy.exceptions import DropItem
 
-class NightcrawlerPipeline:
+class AlkostoPipeline:
 
     def __init__(self):
         client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])

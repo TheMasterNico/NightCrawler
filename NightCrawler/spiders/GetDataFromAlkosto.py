@@ -25,6 +25,11 @@ class GetdatafromalkostoSpider(scrapy.Spider):
     name = 'GetDataFromAlkosto'
     allowed_domains = ['alkosto.com']
     start_urls = ['https://www.alkosto.com/']
+    custom_settings = { #Custom pipeline for this specific spider
+        'ITEM_PIPELINES': {
+            'NightCrawler.pipelines.AlkostoPipeline': 300
+        }
+    }
 
     def parse(self, response): #start function
         #extract link categories with xpath
