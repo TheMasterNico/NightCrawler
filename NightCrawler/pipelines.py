@@ -26,7 +26,25 @@ class NightcrawlerPipeline:
         #categories = category.split("\\")
         #self.collection = self.db[categories[0]]    # The main category    
         #del item['category'] #no store the category
-        self.collection.insert_one(dict(item))
+        #self.collection.insert_one(dict(item))
+        self.collection.update(
+            {
+                'url': item['url']
+            },{
+                '$set': { #Insert this element and then push
+                    'url': item['url'],
+                    'name': item['name'],
+                    'category': item['category']
+                },
+                '$push': { #push new elements into prices array
+                    'prices': {
+                        '$each': [
+                            item['prices']
+                        ],
+                        '$position': 0 #Put the data price at first position
+                    }
+                }
+            }, upsert=True)
         return item
 
 ############SAVE LIKE THIS: https://docs.mongodb.com/manual/tutorial/model-embedded-one-to-many-relationships-between-documents/
