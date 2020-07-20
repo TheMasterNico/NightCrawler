@@ -19,6 +19,7 @@ class NightcrawlerPipeline:
         client = MongoClient(settings['MONGODB_SERVER'], settings['MONGODB_PORT'])
         self.db = client[settings['MONGODB_DB']]
         self.collection = self.db['Items']
+        self.collection.create_index("url", unique=True)
 
     def process_item(self, item, spider):
         #category = item['category']

@@ -35,12 +35,13 @@ class GetdatafromalkostoSpider(scrapy.Spider):
                 title = category.xpath('./h3/text()').get()
                 search_in_db = self.collection.find_one({"name": title})  # search if the category is in DB
                 if not search_in_db:
-                    self.collection.insert_one({"name": title})  # insert item in DB
+                    self.collection.insert_one({"name": title, 'parent': None})  # insert item in DB
                 #print("Get new url: " + title)
-                yield response.follow(link_category, self.get_data_per_page, meta={'title': title, 'url': link_category})
+                yield response.follow(link_category, self.get_data_per_page, meta={'title': title, 'url': link_category, 'parent': title})
 
     def get_data_per_page(self, response):
         title = response.meta.get('title') #Get the argument category
+        parent = response.meta.get('parent')  # Get the parent of the subcategory
         category_url = response.meta.get('url')  # Get the argument category
         
         selectores = response.xpath('//div[@class="subcategories"]/ul/li/a') #Check if the page have categories
@@ -49,9 +50,12 @@ class GetdatafromalkostoSpider(scrapy.Spider):
             for category_selector in selectores: #for each category
                 category_url = category_selector.xpath('./@href').get()
                 subtitle = category_selector.xpath('./@title').get()
-                #print("   " + title + "::" + category_url)
+                #print("   " + subtitle + "::" + str(parent))
+                search_in_db = self.collection.find_one({"name": subtitle})  # search if the category is in DB
+                if not search_in_db:
+                    self.collection.insert_one({"name": subtitle, 'parent': parent})  # insert item in DB
                 # check for more sub categories
-                yield response.follow(category_url, self.get_data_per_page, meta={'title': title + '\\' + subtitle, 'url': category_url})
+                yield response.follow(category_url, self.get_data_per_page, meta={'title': title + '\\' + subtitle, 'url': category_url, 'parent': subtitle})
         else:
             #print("Sarching data in " + title + "(" + url + ")")
             for quote in response.xpath('//ul[contains(@class, "products-grid")]/li[contains(@class, "item")]'): #Para cada h2 con esa clase que se encuentre en la pagina
